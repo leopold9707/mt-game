@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>이어 말하기 게임</title>
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&amp;display=swap" rel="stylesheet"/>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #eef2ff 0%, #f8fafc 100%);
+        font-family: 'Noto Sans KR', sans-serif;
+    }
+    .app {
+        position: relative;
+        width: 1280px;
+        height: 720px;
+        overflow: hidden;
+        border-radius: 24px;
+        box-shadow: 0 24px 80px rgba(15, 23, 42, 0.18);
+        background: #ffffff;
+    }
+    .slide {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.35s ease, visibility 0.35s ease;
+    }
+    .slide.active {
+        opacity: 1;
+        visibility: visible;
+    }
+    .nav-bar {
+        position: absolute;
+        bottom: 24px;
+        right: 24px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        z-index: 30;
+    }
+    .nav-button {
+        width: 54px;
+        height: 54px;
+        border: none;
+        border-radius: 50%;
+        background: rgba(15, 23, 42, 0.9);
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+        display: grid;
+        place-items: center;
+        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.24);
+        transition: transform 0.2s ease, background 0.2s ease;
+    }
+    .nav-button:hover {
+        transform: translateY(-2px);
+        background: #1e293b;
+    }
+    .page-indicator {
+        color: #475569;
+        font-size: 14px;
+        font-weight: 700;
+        background: rgba(255,255,255,0.88);
+        padding: 10px 16px;
+        border-radius: 14px;
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+    }
+
+    /* Slide 1 */
+    .slide-1 .slide-container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    }
+    .slide-1 .bg-pattern {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image:
+            radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.4) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.3) 0%, transparent 50%);
+        z-index: 1;
+    }
+    .slide-1 .content-wrapper {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 1100px;
+        height: 600px;
+        z-index: 10;
+    }
+    .slide-1 .title-section {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+    .slide-1 .main-title {
+        font-family: 'Jua', sans-serif;
+        font-size: 72px;
+        font-weight: 900;
+        color: #2c3e50;
+        text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.1);
+        letter-spacing: 2px;
+        line-height: 1.05;
+    }
+    .slide-1 .title-icon {
+        display: inline-block;
+        margin: 0 12px;
+        animation: bounce 2s infinite;
+    }
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+    .slide-1 .subtitle {
+        font-size: 24px;
+        color: #5a6c7d;
+        margin-top: 14px;
+        font-weight: 400;
+    }
+    .slide-1 .game-intro {
+        background: white;
+        border-radius: 20px;
+        padding: 30px 34px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        margin: 0 auto;
+        width: 900px;
+    }
+    .slide-1 .intro-header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 25px;
+        gap: 12px;
+    }
+    .slide-1 .intro-icon {
+        font-size: 36px;
+        color: #667eea;
+    }
+    .slide-1 .intro-text {
+        font-size: 20px;
+        color: #2c3e50;
+        font-weight: 700;
+        text-align: center;
+    }
+    .slide-1 .game-steps {
+        display: flex;
+        justify-content: space-between;
+        align-items: stretch;
+        margin-top: 20px;
+        gap: 16px;
+    }
+    .slide-1 .step-item {
+        flex: 1;
+        text-align: center;
+        padding: 15px 10px;
+        background: #f8f9fa;
+        border-radius: 15px;
+        border: 2px solid #e9ecef;
+        transition: all 0.3s ease;
+        min-height: 130px;
+    }
+    .slide-1 .step-number {
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        background: #667eea;
+        color: white;
+        border-radius: 50%;
+        font-size: 18px;
+        font-weight: 700;
+        line-height: 40px;
+        margin-bottom: 10px;
+    }
+    .slide-1 .step-text {
+        font-size: 16px;
+        color: #495057;
+        font-weight: 500;
+        line-height: 1.35;
+    }
+    .slide-1 .bottom-info {
+        position: absolute;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: center;
+        gap: 30px;
+    }
+    .slide-1 .info-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 10px 20px;
+        border-radius: 25px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        min-width: 190px;
+        justify-content: flex-start;
+    }
+    .slide-1 .info-icon {
+        font-size: 20px;
+        color: #667eea;
+        flex: 0 0 auto;
+    }
+    .slide-1 .info-text {
+        font-size: 16px;
+        color: #2c3e50;
+        font-weight: 500;
+        line-height: 1.25;
+        word-break: keep-all;
+    }
+    .slide-1 .decoration-circle {
+        position: absolute;
+        border-radius: 50%;
+        opacity: 0.6;
+    }
+    .slide-1 .circle-1 {
+        width: 100px;
+        height: 100px;
+        background: rgba(102, 126, 234, 0.3);
+        top: 50px;
+        right: 100px;
+    }
+    .slide-1 .circle-2 {
+        width: 80px;
+        height: 80px;
+        background: rgba(118, 75, 162, 0.3);
+        bottom: 100px;
+        left: 80px;
+    }
+    .slide-1 .circle-3 {
+        width: 60px;
+        height: 60px;
+        background: rgba(102, 126, 234, 0.2);
+        top: 150px;
+        left: 150px;
+    }
+
+    /* Slide 2 */
+    .slide-2 .slide-container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
+    .slide-2 .slide-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    }
+    .slide-2 .content-wrapper {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        padding: 40px 60px;
+    }
+    .slide-2 .header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+    .slide-2 .header-icon {
+        width: 60px;
+        height: 60px;
+        background: #f59e0b;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 20px;
+        box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+    }
+    .slide-2 .header-icon i {
+        font-size: 32px;
+        color: white;
+    }
+    .slide-2 .header-text h1 {
+        font-size: 36px;
+        font-weight: 900;
+        color: #1f2937;
+        margin: 0;
+    }
+    .slide-2 .header-text p {
+        font-size: 16px;
+        color: #6b7280;
+        margin: 5px 0 0 0;
+    }
+    .slide-2 .rules-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 22px 20px;
+        margin-top: 20px;
+    }
+    .slide-2 .rule-card {
+        background: white;
+        border-radius: 16px;
+        padding: 20px 22px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        display: flex;
+        align-items: flex-start;
+        transition: all 0.3s ease;
+        border: 2px solid #e5e7eb;
+        min-height: 100px;
+    }
+    .slide-2 .rule-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+    .slide-2 .rule-number {
+        width: 40px;
+        height: 40px;
+        background: #f59e0b;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 18px;
+        margin-right: 15px;
+        flex-shrink: 0;
+    }
+    .slide-2 .rule-content { flex: 1; min-width: 0; }
+    .slide-2 .rule-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 8px;
+    }
+    .slide-2 .rule-desc {
+        font-size: 14px;
+        color: #6b7280;
+        line-height: 1.6;
+    }
+    .slide-2 .highlight {
+        background: #fef3c7;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-weight: 600;
+    }
+    .slide-2 .score-display {
+        position: absolute;
+        top: 40px;
+        right: 60px;
+        background: white;
+        padding: 15px 25px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    .slide-2 .score-text {
+        font-size: 14px;
+        color: #6b7280;
+    }
+    .slide-2 .score-value {
+        font-size: 24px;
+        font-weight: 700;
+        color: #f59e0b;
+    }
+    .slide-2 .footer {
+        position: absolute;
+        bottom: 30px;
+        left: 60px;
+        right: 60px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .slide-2 .footer-text {
+        font-size: 14px;
+        color: #6b7280;
+    }
+    .slide-2 .game-icon {
+        position: absolute;
+        right: 50px;
+        bottom: 18px;
+        opacity: 0.12;
+        font-size: 170px;
+        color: #f59e0b;
+        pointer-events: none;
+    }
+
+    /* Slide 3 */
+    .slide-3 .slide-container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
+    .slide-3 .slide-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
+    }
+    .slide-3 .content-wrapper {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        padding: 30px 50px;
+    }
+    .slide-3 .header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    .slide-3 .header-icon {
+        width: 50px;
+        height: 50px;
+        background: #3b82f6;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+    }
+    .slide-3 .header-icon i {
+        font-size: 24px;
+        color: white;
+    }
+    .slide-3 .header-text h1 {
+        font-size: 32px;
+        font-weight: 900;
+        color: #1f2937;
+        margin: 0;
+    }
+    .slide-3 .header-text p {
+        font-size: 16px;
+        color: #6b7280;
+        margin: 5px 0 0 0;
+    }
+    .slide-3 .main-content {
+        display: flex;
+        gap: 30px;
+        margin-top: 15px;
+    }
+    .slide-3 .left-section,
+    .slide-3 .right-section {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    .slide-3 .example-card {
+        background: white;
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        border: 2px solid #e5e7eb;
+    }
+    .slide-3 .card-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .slide-3 .card-title i { color: #3b82f6; }
+    .slide-3 .game-illustration {
+        width: 100%;
+        height: 200px;
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+    }
+    .slide-3 .characters {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+        position: relative;
+        z-index: 10;
+    }
+    .slide-3 .character {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+    }
+    .slide-3 .character-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: white;
+        border: 3px solid #3b82f6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .slide-3 .character-name {
+        font-size: 12px;
+        color: #1f2937;
+        font-weight: 600;
+    }
+    .slide-3 .speech-bubble {
+        position: relative;
+        background: white;
+        border-radius: 12px;
+        padding: 10px 15px;
+        margin-bottom: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        min-width: 80px;
+        text-align: center;
+    }
+    .slide-3 .speech-bubble::after {
+        content: '';
+        position: absolute;
+        bottom: -8px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-width: 8px 8px 0;
+        border-style: solid;
+        border-color: white transparent transparent transparent;
+    }
+    .slide-3 .bubble-text {
+        font-size: 16px;
+        font-weight: 700;
+        color: #1f2937;
+    }
+    .slide-3 .bubble-sub {
+        font-size: 12px;
+        color: #6b7280;
+        margin-top: 2px;
+    }
+    .slide-3 .answer-bubble {
+        background: #dcfce7;
+        border: 2px solid #22c55e;
+    }
+    .slide-3 .answer-bubble::after {
+        border-color: #dcfce7 transparent transparent transparent;
+    }
+    .slide-3 .answer-text { color: #15803d; }
+    .slide-3 .score-calculation {
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        border-radius: 12px;
+        padding: 15px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 10px;
+    }
+    .slide-3 .score-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .slide-3 .score-number {
+        font-size: 24px;
+        font-weight: 700;
+        color: #1f2937;
+    }
+    .slide-3 .score-label {
+        font-size: 14px;
+        color: #6b7280;
+    }
+    .slide-3 .process-flow {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 10px;
+    }
+    .slide-3 .process-step {
+        flex: 1;
+        text-align: center;
+        padding: 10px;
+        background: #f8fafc;
+        border-radius: 8px;
+        border: 2px solid #e5e7eb;
+    }
+    .slide-3 .process-step.active {
+        background: #dbeafe;
+        border-color: #3b82f6;
+    }
+    .slide-3 .step-label {
+        font-size: 12px;
+        color: #6b7280;
+        margin-bottom: 4px;
+    }
+    .slide-3 .step-value {
+        font-size: 14px;
+        font-weight: 700;
+        color: #1f2937;
+    }
+    .slide-3 .arrow-icon {
+        color: #3b82f6;
+        font-size: 16px;
+    }
+    .slide-3 .highlight-box {
+        background: #fef3c7;
+        border-radius: 8px;
+        padding: 12px;
+        margin-top: 10px;
+    }
+    .slide-3 .highlight-text {
+        font-size: 14px;
+        color: #1f2937;
+        line-height: 1.5;
+    }
+    .slide-3 .highlight-number {
+        background: #f59e0b;
+        color: white;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-weight: 600;
+    }
+    .slide-3 .bottom-message {
+        position: absolute;
+        left: 50%;
+        bottom: 80px;
+        transform: translateX(-50%);
+        width: calc(100% - 120px);
+        max-width: 760px;
+        padding: 16px 22px;
+        background: rgba(59, 130, 246, 0.12);
+        border: 1px solid rgba(59, 130, 246, 0.22);
+        border-radius: 18px;
+        color: #1e3a8a;
+        text-align: center;
+        font-size: 20px;
+        font-weight: 800;
+        box-shadow: 0 10px 30px rgba(59, 130, 246, 0.12);
+    }
+</style>
+</head>
+<body>
+<div class="app">
+    <div class="slide slide-1 active" data-index="1">
+        <div class="slide-container">
+            <div class="bg-pattern"></div>
+            <div class="decoration-circle circle-1"></div>
+            <div class="decoration-circle circle-2"></div>
+            <div class="decoration-circle circle-3"></div>
+            <div class="content-wrapper">
+                <div class="title-section">
+                    <div class="main-title">
+                        <span class="title-icon">🎮</span>
+                        이어 말하기 게임
+                        <span class="title-icon">🎯</span>
+                    </div>
+                    <div class="subtitle">한 글자씩 이어 말하고 정답을 맞히자!</div>
+                </div>
+                <div class="game-intro">
+                    <div class="intro-header">
+                        <i class="fas fa-lightbulb intro-icon"></i>
+                        <span class="intro-text">팀원들과 함께 즐기는 단어 맞추기 게임</span>
+                    </div>
+                    <div class="game-steps">
+                        <div class="step-item">
+                            <div class="step-number">1</div>
+                            <div class="step-text">3명에게<br/>제시어 부여</div>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-number">2</div>
+                            <div class="step-text">한 글자씩<br/>순서대로 설명</div>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-number">3</div>
+                            <div class="step-text">남은 1명이<br/>정답 맞추기</div>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-number">4</div>
+                            <div class="step-text">승점 획득<br/>게임 진행</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bottom-info">
+                    <div class="info-item">
+                        <i class="fas fa-users info-icon"></i>
+                        <span class="info-text">4명 팀 플레이</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-clock info-icon"></i>
+                        <span class="info-text">제한 시간 없음</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-star info-icon"></i>
+                        <span class="info-text">문제당 최대 10점</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide slide-2" data-index="2">
+        <div class="slide-container">
+            <div class="slide-bg"></div>
+            <div class="content-wrapper">
+                <div class="header">
+                    <div class="header-icon">
+                        <i class="fas fa-gamepad"></i>
+                    </div>
+                    <div class="header-text">
+                        <h1>게임 규칙</h1>
+                        <p>이어 말하기 게임을 즐기기 위한 5가지 규칙을 확인하세요</p>
+                    </div>
+                </div>
+                <div class="rules-grid">
+                    <div class="rule-card">
+                        <div class="rule-number">1</div>
+                        <div class="rule-content">
+                            <div class="rule-title">팀원 구성</div>
+                            <div class="rule-desc">팀원 <span class="highlight">3명</span>에게 제시어가 부여되고, 남은 <span class="highlight">1명</span>은 정답을 맞춥니다.</div>
+                        </div>
+                    </div>
+                    <div class="rule-card">
+                        <div class="rule-number">2</div>
+                        <div class="rule-content">
+                            <div class="rule-title">제시어 설명</div>
+                            <div class="rule-desc">제시어를 확인한 팀원 3명은 <span class="highlight">순서대로 한 글자씩</span> 말하며 제시어를 설명합니다.</div>
+                        </div>
+                    </div>
+                    <div class="rule-card">
+                        <div class="rule-number">3</div>
+                        <div class="rule-content">
+                            <div class="rule-title">승점 계산</div>
+                            <div class="rule-desc">문제마다 <span class="highlight">승점 10점</span>으로 시작하며, 정답을 맞출 때까지 글자당 1점 차감됩니다.</div>
+                        </div>
+                    </div>
+                    <div class="rule-card">
+                        <div class="rule-number">4</div>
+                        <div class="rule-content">
+                            <div class="rule-title">정답 도전</div>
+                            <div class="rule-desc">정답 도전에 <span class="highlight">제한은 없지만</span>, 오답인 경우 1점씩 추가로 차감됩니다.</div>
+                        </div>
+                    </div>
+                    <div class="rule-card">
+                        <div class="rule-number">5</div>
+                        <div class="rule-content">
+                            <div class="rule-title">승점 획득</div>
+                            <div class="rule-desc">정답을 맞추었을 때 <span class="highlight">남아있는 승점</span>을 획득합니다. 예: 10점 - 3점 = 7점</div>
+                        </div>
+                    </div>
+                    <div class="rule-card">
+                        <div class="rule-number">6</div>
+                        <div class="rule-content">
+                            <div class="rule-title">총 라운드</div>
+                            <div class="rule-desc">게임은 총 <span class="highlight">10라운드</span>로 구성됩니다.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="score-display">
+                    <div class="score-text">최대 승점</div>
+                    <div class="score-value">100점</div>
+                </div>
+                <div class="footer">
+                    <div class="footer-text">게임을 시작하기 전 모든 팀원이 규칙을 숙지했는지 확인하세요</div>
+                    <div class="footer-text">Page 2 of 3</div>
+                </div>
+                <i class="fas fa-puzzle-piece game-icon"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide slide-3" data-index="3">
+        <div class="slide-container">
+            <div class="slide-bg"></div>
+            <div class="content-wrapper">
+                <div class="header">
+                    <div class="header-icon">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <div class="header-text">
+                        <h1>예시 설명</h1>
+                        <p>실제 게임 진행 상황을 보여드립니다</p>
+                    </div>
+                </div>
+                <div class="main-content">
+                    <div class="left-section">
+                        <div class="example-card">
+                            <div class="card-title">
+                                <i class="fas fa-users"></i>
+                                <span>게임 참가자</span>
+                            </div>
+                            <div class="game-illustration">
+                                <div class="characters">
+                                    <div class="character">
+                                        <div class="speech-bubble">
+                                            <div class="bubble-text">일</div>
+                                            <div class="bubble-sub">첫 글자</div>
+                                        </div>
+                                        <div class="character-avatar">👤</div>
+                                        <div class="character-name">참가자 1</div>
+                                    </div>
+                                    <div class="character">
+                                        <div class="speech-bubble">
+                                            <div class="bubble-text">본</div>
+                                            <div class="bubble-sub">두 번째</div>
+                                        </div>
+                                        <div class="character-avatar">👤</div>
+                                        <div class="character-name">참가자 2</div>
+                                    </div>
+                                    <div class="character">
+                                        <div class="speech-bubble">
+                                            <div class="bubble-text">술</div>
+                                            <div class="bubble-sub">세 번째</div>
+                                        </div>
+                                        <div class="character-avatar">👤</div>
+                                        <div class="character-name">참가자 3</div>
+                                    </div>
+                                    <div class="character">
+                                        <div class="speech-bubble answer-bubble">
+                                            <div class="bubble-text answer-text">정답!</div>
+                                            <div class="bubble-sub">사케</div>
+                                        </div>
+                                        <div class="character-avatar" style="background: #dcfce7; border-color: #22c55e;">🎯</div>
+                                        <div class="character-name">정답자</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="score-calculation">
+                                <div class="score-item">
+                                    <span class="score-number">10</span>
+                                    <span class="score-label">점 시작</span>
+                                </div>
+                                <div class="score-item">
+                                    <span class="score-number">-</span>
+                                    <span class="score-label">3점 차감</span>
+                                </div>
+                                <div class="score-item">
+                                    <span class="score-number">=</span>
+                                    <span class="score-label">7점 획득</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="right-section">
+                        <div class="example-card">
+                            <div class="card-title">
+                                <i class="fas fa-calculator"></i>
+                                <span>승점 계산 과정</span>
+                            </div>
+                            <div class="process-flow">
+                                <div class="process-step active">
+                                    <div class="step-label">초기 승점</div>
+                                    <div class="step-value">10점</div>
+                                </div>
+                                <div class="arrow-icon"><i class="fas fa-arrow-right"></i></div>
+                                <div class="process-step">
+                                    <div class="step-label">글자 사용</div>
+                                    <div class="step-value">-3점</div>
+                                </div>
+                                <div class="arrow-icon"><i class="fas fa-arrow-right"></i></div>
+                                <div class="process-step">
+                                    <div class="step-label">최종 승점</div>
+                                    <div class="step-value">7점</div>
+                                </div>
+                            </div>
+                            <div class="highlight-box">
+                                <div class="highlight-text">
+                                    <span class="highlight-number">10점</span>에서 시작하여 <span class="highlight-number">3글자</span>를 사용했으므로 <span class="highlight-number">3점</span> 차감 → <span class="highlight-number">7점</span> 획득
+                                </div>
+                            </div>
+                        </div>
+                        <div class="example-card">
+                            <div class="card-title">
+                                <i class="fas fa-info-circle"></i>
+                                <span>게임 팁</span>
+                            </div>
+                            <div class="highlight-text" style="font-size: 14px; color: #1f2937; line-height: 1.6;">
+                                • 한 글자씩 설명할 때 <strong>구체적인 단서</strong>를 제공하세요<br/>
+                                • 정답자는 <strong>빠른 추론</strong>이 중요합니다<br/>
+                                • <strong>팀워크</strong>를 통해 효율적인 설명을 만드세요
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bottom-message">정답자 1명을 정해주세요!</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="nav-bar">
+        <div class="page-indicator">1 / 3</div>
+        <button class="nav-button" id="prevBtn" aria-label="이전 슬라이드"><i class="fas fa-chevron-left"></i></button>
+        <button class="nav-button" id="nextBtn" aria-label="다음 슬라이드"><i class="fas fa-chevron-right"></i></button>
+    </div>
+</div>
+<script>
+    const slides = document.querySelectorAll('.slide');
+    const pageIndicator = document.querySelector('.page-indicator');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    let currentIndex = 0;
+
+    function updateSlides() {
+        slides.forEach((slide, index) => {
+            slide.classList.toggle('active', index === currentIndex);
+        });
+        pageIndicator.textContent = `${currentIndex + 1} / ${slides.length}`;
+        prevBtn.disabled = currentIndex === 0;
+        nextBtn.disabled = currentIndex === slides.length - 1;
+        prevBtn.style.opacity = currentIndex === 0 ? '0.4' : '1';
+        nextBtn.style.opacity = currentIndex === slides.length - 1 ? '0.4' : '1';
+    }
+
+    prevBtn.addEventListener('click', () => {
+        if (currentIndex > 0) {
+            currentIndex -= 1;
+            updateSlides();
+        }
+    });
+
+    nextBtn.addEventListener('click', () => {
+        if (currentIndex < slides.length - 1) {
+            currentIndex += 1;
+            updateSlides();
+        }
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'ArrowLeft') {
+            prevBtn.click();
+        } else if (event.key === 'ArrowRight') {
+            nextBtn.click();
+        }
+    });
+</script>
+</body>
+</html>
